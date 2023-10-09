@@ -6,12 +6,13 @@ from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charityproject import charity_project_crud
 from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB
+from app.services import investing
 
 router = APIRouter()
 
 
 @router.post(
-    '/charity_project/',
+    '/',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)]
@@ -26,5 +27,6 @@ async def create_new_charity_project(
         charity_project,
         session
     )
+    new_charity_project = await investing(new_charity_project, session)
     return new_charity_project
 
