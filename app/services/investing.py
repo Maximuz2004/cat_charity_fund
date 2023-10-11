@@ -14,4 +14,4 @@ async def investing(
 
     # await session.commit()        # TODO раскоментировать как все будет готово
     # await session.refresh(investment_object) # TODO раскоментировать как все будет готово
-    return object
+    return investment_object

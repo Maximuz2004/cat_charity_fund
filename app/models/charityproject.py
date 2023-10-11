@@ -21,3 +21,4 @@ class CharityProject(CharityProjectDonationAbstractBase):
     def validate_full_amount(self, key, value):
         if value <= 0:
             raise ValueError(FULL_AMOUNT_ERROR_MESSAGE.format(key))
+        return value

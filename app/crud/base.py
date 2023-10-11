@@ -49,6 +49,7 @@ class CRUDBase:
             object_in,
             session: AsyncSession,
     ):
+        print('Зашли в метод Update')
         object_data = jsonable_encoder(db_object)
         update_data = object_in.dict(exclude_unset=True)
         for field in object_data:
