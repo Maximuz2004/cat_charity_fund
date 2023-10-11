@@ -8,12 +8,12 @@ from app.models import CharityProject
 from app.schemas.charityproject import CharityProjectUpdate
 
 UNPROCESSABLE_ENTITY_MESSAGE = 'Проект с именем {} уже существует!'
-PROJECT_NOT_FOUND_MESSAGE = 'Проект с таким именем уже существует!'
+PROJECT_NOT_FOUND_MESSAGE = 'Проект с таким именем не существует!'
 PROJECT_CANT_BE_MODIFIED = ('Проект закрыт, поэтому не может быть изменен или'
                             ' удален!')
 FULL_AMOUNT_UPDATE_ERROR = ('Новая требуемая сумма не должна быть меньше'
                             ' предыдущей.')
-
+PROJECT_ALREADY_INVEST = 'Нельзя удалить проект в который уже вложены деньги'
 
 async def check_name_duplicate(
         room_name: str,
@@ -60,3 +60,13 @@ async def check_can_project_be_modified(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
                 detail=FULL_AMOUNT_UPDATE_ERROR
             )
+
+
+async def check_project_investing(
+        project: CharityProject,
+) -> None:
+    if project.invested_amount != 0:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=PROJECT_ALREADY_INVEST,
+        )
