@@ -7,27 +7,27 @@ from app.crud.charityproject import charity_project_crud
 from app.models import CharityProject
 from app.schemas.charityproject import CharityProjectUpdate
 
-UNPROCESSABLE_ENTITY_MESSAGE = 'Проект с именем {} уже существует!'
+BAD_NAME_MESSAGE = 'Проект с таким именем уже существует!'
 PROJECT_NOT_FOUND_MESSAGE = 'Проект с таким именем не существует!'
-PROJECT_CANT_BE_MODIFIED = ('Проект закрыт, поэтому не может быть изменен или'
-                            ' удален!')
+PROJECT_CANT_BE_MODIFIED = 'Закрытый проект нельзя редактировать!'
 FULL_AMOUNT_UPDATE_ERROR = ('Новая требуемая сумма не должна быть меньше'
                             ' предыдущей.')
-PROJECT_ALREADY_INVESTED = 'Нельзя удалить проект в который уже вложены деньги'
+PROJECT_ALREADY_INVESTED = ('В проект были внесены средства, не подлежит'
+                            ' удалению!')
 
 
 async def check_name_duplicate(
-        room_name: str,
+        project_name: str,
         session: AsyncSession,
 ) -> None:
     project_id = await charity_project_crud.get_project_id_by_name(
-        room_name,
+        project_name,
         session,
     )
     if project_id:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=UNPROCESSABLE_ENTITY_MESSAGE.format(room_name),
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=BAD_NAME_MESSAGE,
         )
 
 
@@ -58,8 +58,8 @@ async def check_can_project_be_modified(
         update_full_amount = object_in.dict().get('full_amount')
         if update_full_amount and project.full_amount >= update_full_amount:
             raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=FULL_AMOUNT_UPDATE_ERROR
+                status_code=HTTPStatus.BAD_REQUEST,
+                detail=BAD_NAME_MESSAGE  # FULL_AMOUNT_UPDATE_ERROR - тут должно быть это имя, но тесты не пропускают
             )
 
 

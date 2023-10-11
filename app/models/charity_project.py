@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Text
 from sqlalchemy.orm import validates
 
-from app.core.db import CharityProjectDonationAbstractBase
+from .abstract import CharityProjectDonationAbstractBase
 
 VALUE_ERROR_MESSAGE = 'Поле {} не может быть пустым'
 FULL_AMOUNT_ERROR_MESSAGE = 'Поле {} не может быть меньше нуля'
