@@ -7,10 +7,14 @@ from pydantic import BaseModel, Field, PositiveInt
 class DonationBase(BaseModel):
     full_amount: PositiveInt
     comment: Optional[str]
+    create_date: datetime
 
 
 class DonationCreate(DonationBase):
-    pass
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
 class DonationDB(DonationCreate):
@@ -19,6 +23,3 @@ class DonationDB(DonationCreate):
     invested_amount: int = Field(0)
     fully_invested: bool
     close_date: Optional[datetime]
-
-    class Config:
-        orm_mode = True
