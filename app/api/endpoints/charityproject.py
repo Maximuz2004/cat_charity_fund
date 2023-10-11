@@ -64,16 +64,13 @@ async def partially_update_charity_project(
         session: AsyncSession = Depends(get_async_session)
 ):
     """Только для суперюзеров."""
-    print('Начинаем обновлять проект')
     project = await check_project_exists(project_id, session)
-    print('Полуили проект по id')
     if object_in:
         await check_can_project_be_modified(
             project=project,
             object_in=object_in
         )
         await check_name_duplicate(object_in.dict().get('name'), session) # TODO Проверить ситуацию, если имени не будет
-    print('Сделали валидацию данных')
     project = await charity_project_crud.update(project, object_in, session)
     return project
 

@@ -53,7 +53,6 @@ async def check_can_project_be_modified(
             status_code=HTTPStatus.BAD_REQUEST,
             detail=PROJECT_CANT_BE_MODIFIED
         )
-    print('проверка fully_invested пройдена')
     if object_in:
         update_full_amount = object_in.dict().get('full_amount')
         if update_full_amount and project.full_amount >= update_full_amount:
@@ -61,4 +60,3 @@ async def check_can_project_be_modified(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
                 detail=FULL_AMOUNT_UPDATE_ERROR
             )
-        print('Проверка full_amount пройдена')
