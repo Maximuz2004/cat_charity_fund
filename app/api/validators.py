@@ -13,7 +13,8 @@ PROJECT_CANT_BE_MODIFIED = ('Проект закрыт, поэтому не мо
                             ' удален!')
 FULL_AMOUNT_UPDATE_ERROR = ('Новая требуемая сумма не должна быть меньше'
                             ' предыдущей.')
-PROJECT_ALREADY_INVEST = 'Нельзя удалить проект в который уже вложены деньги'
+PROJECT_ALREADY_INVESTED = 'Нельзя удалить проект в который уже вложены деньги'
+
 
 async def check_name_duplicate(
         room_name: str,
@@ -68,5 +69,5 @@ async def check_project_investing(
     if project.invested_amount != 0:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail=PROJECT_ALREADY_INVEST,
+            detail=PROJECT_ALREADY_INVESTED,
         )

@@ -24,14 +24,14 @@ router = APIRouter()
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
-async def create_new_charity_project(
+async def create_charity_project(
         charity_project: CharityProjectCreate,
         session: AsyncSession = Depends(get_async_session),
 ):
     """Только для суперюзеров."""
     await check_name_duplicate(charity_project.name, session)
     try:
-        new_charity_project = await charity_project_crud.create(
+        new_project = await charity_project_crud.create(
             charity_project,
             session
         )
@@ -40,7 +40,7 @@ async def create_new_charity_project(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=str(error)
         )
-    return await investing(new_charity_project, session)
+    return await investing(new_project, session)
 
 
 @router.get(
@@ -74,7 +74,7 @@ async def partially_update_charity_project(
         )
         await check_name_duplicate(object_in.dict().get('name'), session)
     return await investing(
-        charity_project_crud.update(project, object_in, session),
+        await charity_project_crud.update(project, object_in, session),
         session
     )
 
