@@ -4,6 +4,7 @@ from sqlalchemy import Boolean, Column, DateTime, Integer
 
 from app.core.db import Base
 
+
 class CharityProjectDonationAbstractBase(Base):
     __abstract__ = True
     full_amount = Column(Integer, nullable=False)
@@ -11,3 +12,6 @@ class CharityProjectDonationAbstractBase(Base):
     fully_invested = Column(Boolean, default=False)
     create_date = Column(DateTime, default=datetime.now)
     close_date = Column(DateTime)
+
+    def is_fully_invested(self):
+        return self.invested_amount >= self.full_amount

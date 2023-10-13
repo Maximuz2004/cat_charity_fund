@@ -22,3 +22,6 @@ class CharityProject(CharityProjectDonationAbstractBase):
         if value <= 0:
             raise ValueError(FULL_AMOUNT_ERROR_MESSAGE.format(key))
         return value
+
+    def __repr__(self):
+        return f'Проект: "{self.name}", на сумму: {self.full_amount}'

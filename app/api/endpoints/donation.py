@@ -32,7 +32,9 @@ async def create_donation(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=str(error)
         )
-    return await investing(new_donation, session)
+    await investing(session)
+    await session.refresh(new_donation)
+    return new_donation
 
 
 @router.get(

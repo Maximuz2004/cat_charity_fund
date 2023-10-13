@@ -40,7 +40,9 @@ async def create_charity_project(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=str(error)
         )
-    return await investing(new_project, session)
+    await investing(session)
+    await session.refresh(new_project)
+    return new_project
 
 
 @router.get(
@@ -73,11 +75,7 @@ async def partially_update_charity_project(
             object_in=object_in
         )
         await check_name_duplicate(object_in.dict().get('name'), session)
-    return await investing(
-        await charity_project_crud.update(project, object_in, session),
-        session
-    )
-
+    return await charity_project_crud.update(project, object_in, session)
 
 @router.delete(
     '/{project_id}',
