@@ -41,26 +41,25 @@ async def check_project_exists(
             status_code=HTTPStatus.NOT_FOUND,
             detail=PROJECT_NOT_FOUND_MESSAGE,
         )
+    print('Проект существует, проверяем дальше.')
     return project
 
 
 async def check_can_project_be_modified(
-        *,
         project: CharityProject,
-        object_in: CharityProjectUpdate = None,
+        object_in: CharityProjectUpdate,
 ) -> None:
-    if project.fully_invested:
+    if project.close_date is not None:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail=PROJECT_CANT_BE_MODIFIED
         )
-    if object_in:
-        update_full_amount = object_in.dict().get('full_amount')
-        if update_full_amount and project.full_amount >= update_full_amount:
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail=BAD_NAME_MESSAGE  # FULL_AMOUNT_UPDATE_ERROR - тут должно быть это имя, но тесты не пропускают
-            )
+    new_full_amount = object_in.full_amount
+    if new_full_amount and project.invested_amount > new_full_amount:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=FULL_AMOUNT_UPDATE_ERROR
+        )
 
 
 async def check_project_investing(

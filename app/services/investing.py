@@ -7,13 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import CharityProject, Donation
 
 
-async def close_object(obj: Union[CharityProject, Donation]) -> None:
-    obj.invested_amount = obj.full_amount
-    obj.fully_invested = True
-    obj.close_date = datetime.now()
-
-
 async def investing(session: AsyncSession) -> None:
+    async def close_object(obj: Union[CharityProject, Donation]) -> None:
+        obj.invested_amount = obj.full_amount
+        obj.fully_invested = True
+        obj.close_date = datetime.now()
+
     query = await session.execute(
         select(
             CharityProject

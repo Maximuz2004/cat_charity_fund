@@ -8,7 +8,7 @@ from app.core.user import current_superuser, current_user
 from app.crud.donation import donation_crud
 from app.models import User
 
-from app.schemas.donation import DonationCreate, DonationDB
+from app.schemas.donation import DonationCreate, DonationDB, DonationGet
 from app.services import investing
 
 router = APIRouter()
@@ -39,7 +39,7 @@ async def create_donation(
 
 @router.get(
     '/',
-    response_model=list[DonationDB],
+    response_model=list[DonationGet],
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
@@ -52,7 +52,7 @@ async def get_all_donations(
 
 @router.get(
     '/my',
-    response_model=list[DonationCreate],
+    response_model=list[DonationDB],
 )
 async def get_my_donations(
         session: AsyncSession = Depends(get_async_session),

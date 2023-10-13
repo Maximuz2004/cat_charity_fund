@@ -19,7 +19,7 @@ class CharityProject(CharityProjectDonationAbstractBase):
 
     @validates('full_amount')
     def validate_full_amount(self, key, value):
-        if value <= 0:
+        if value <= 0 or value is None:
             raise ValueError(FULL_AMOUNT_ERROR_MESSAGE.format(key))
         return value
 

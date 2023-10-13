@@ -28,10 +28,11 @@ async def create_charity_project(
         charity_project: CharityProjectCreate,
         session: AsyncSession = Depends(get_async_session),
 ):
-    """Только для суперюзеров."""
+    """Только для суперюзеров.
+    Создаёт благотворительный проект."""
     await check_name_duplicate(charity_project.name, session)
     try:
-        new_project = await charity_project_crud.create(
+        project = await charity_project_crud.create(
             charity_project,
             session
         )
@@ -41,8 +42,8 @@ async def create_charity_project(
             detail=str(error)
         )
     await investing(session)
-    await session.refresh(new_project)
-    return new_project
+    await session.refresh(project)
+    return project
 
 
 @router.get(
@@ -59,7 +60,6 @@ async def get_all_charity_projects(
 @router.patch(
     '/{project_id}',
     response_model=CharityProjectDB,
-    response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
 async def partially_update_charity_project(
@@ -67,20 +67,28 @@ async def partially_update_charity_project(
         object_in: CharityProjectUpdate,
         session: AsyncSession = Depends(get_async_session)
 ):
-    """Только для суперюзеров."""
+    """Только для суперюзеров.
+    Закрытый проект нельзя редактировать;
+    нельзя установить требуемую сумму меньше уже вложенной."""
     project = await check_project_exists(project_id, session)
-    if object_in:
-        await check_can_project_be_modified(
-            project=project,
-            object_in=object_in
+    if object_in.name is not None:
+        await check_name_duplicate(object_in.name, session)
+    await check_can_project_be_modified(
+        project=project,
+        object_in=object_in
+    )
+    try:
+        project = await charity_project_crud.update(project, object_in, session)
+    except ValueError as error:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=str(error)
         )
-        await check_name_duplicate(object_in.dict().get('name'), session)
-    return await charity_project_crud.update(project, object_in, session)
+    return project
 
 @router.delete(
     '/{project_id}',
     response_model=CharityProjectDB,
-    response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
 async def remove_charity_project(
