@@ -53,9 +53,9 @@ class CharityProjectUpdate(CharityProjectBase):
         if value is None:
             raise ValueError(FULL_AMOUNT_ERROR)
         if (
-            INVESTED_AMOUNT_FIELD_NAME in values
-            and values[INVESTED_AMOUNT_FIELD_NAME] is not None
-            and value < values[INVESTED_AMOUNT_FIELD_NAME]
+            INVESTED_AMOUNT_FIELD_NAME in values and
+            values[INVESTED_AMOUNT_FIELD_NAME] is not None and
+            value < values[INVESTED_AMOUNT_FIELD_NAME]
         ):
             raise ValueError(FULL_AMOUNT_LESS_INVESTED_AMOUNT_ERROR)
         return value
