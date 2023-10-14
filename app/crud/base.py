@@ -1,22 +1,28 @@
-from typing import Optional
+from typing import Generic, Optional, TypeVar
 
 from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.db import Base
 from app.models import User
 
+Model = TypeVar('Model', bound=Base)
+Schema = TypeVar('Schema', bound=BaseModel)
 
-class CRUDBase:
-    def __init__(self, model):
+
+class CRUDBase(Generic[Model, Schema]):
+
+    def __init__(self, model: Model):
         self.model = model
 
     async def create(
             self,
-            object_in,
+            object_in: Schema,
             session: AsyncSession,
             user: Optional[User] = None,
-    ):
+    ) -> Optional[Model]:
         object_in_data = object_in.dict()
         if user:
             object_in_data['user_id'] = user.id
@@ -30,7 +36,7 @@ class CRUDBase:
             self,
             object_id: int,
             session: AsyncSession,
-    ):
+    ) -> Optional[Model]:
         db_object = await session.execute(
             select(self.model).where(self.model.id == object_id)
         )
@@ -39,16 +45,16 @@ class CRUDBase:
     async def get_multi(
             self,
             session: AsyncSession,
-    ):
+    ) -> list[Optional[Model]]:
         db_objects = await session.execute(select(self.model))
         return db_objects.scalars().all()
 
     async def update(
             self,
-            db_object,
-            object_in,
+            db_object: Model,
+            object_in: Schema,
             session: AsyncSession,
-    ):
+    ) -> Optional[Model]:
         object_data = jsonable_encoder(db_object)
         update_data = object_in.dict(exclude_unset=True)
         for field in object_data:
@@ -61,9 +67,9 @@ class CRUDBase:
 
     async def remove(
             self,
-            db_object,
+            db_object: Model,
             session: AsyncSession,
-    ):
+    ) -> Optional[Model]:
         await session.delete(db_object)
         await session.commit()
         return db_object

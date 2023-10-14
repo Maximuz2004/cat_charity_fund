@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.charityproject import charity_project_crud
 from app.models import CharityProject
-from app.schemas.charityproject import CharityProjectUpdate
+from app.schemas.charity_project import CharityProjectUpdate
 
 BAD_NAME_MESSAGE = 'Проект с таким именем уже существует!'
 PROJECT_NOT_FOUND_MESSAGE = 'Проект с таким именем не существует!'
@@ -41,7 +41,6 @@ async def check_project_exists(
             status_code=HTTPStatus.NOT_FOUND,
             detail=PROJECT_NOT_FOUND_MESSAGE,
         )
-    print('Проект существует, проверяем дальше.')
     return project
 
 

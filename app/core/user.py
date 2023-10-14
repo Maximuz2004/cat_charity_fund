@@ -15,20 +15,31 @@ from app.core.db import get_async_session
 from app.models import User
 from app.schemas.user import UserCreate
 
+TOKEN_URL = 'auth/jwt/login'
+TOKEN_LIFE_TIME = 3600
+AUTH_BACKEND_NAME = 'jwt'
+PASSWORD_LEN_VALUE = 3
+PASSWORD_LEN_ERROR_MESSAGE = (f'Password should be at least'
+                              f' {PASSWORD_LEN_VALUE} characters')
+NO_EMAIL_IN_PASSWORD_MESSAGE = 'Пароль не должен содержать e-mail'
+
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, User)
 
 
-bearer_transport = BearerTransport(tokenUrl='auth/jwt/login')
+bearer_transport = BearerTransport(tokenUrl=TOKEN_URL)
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.secret, lifetime_seconds=3600)
+    return JWTStrategy(
+        secret=settings.secret,
+        lifetime_seconds=TOKEN_LIFE_TIME
+    )
 
 
 auth_backend = AuthenticationBackend(
-    name='jwt',
+    name=AUTH_BACKEND_NAME,
     transport=bearer_transport,
     get_strategy=get_jwt_strategy,
 )
@@ -40,13 +51,13 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             password: str,
             user: Union[UserCreate, User]
     ) -> None:
-        if len(password) < 3:
+        if len(password) < PASSWORD_LEN_VALUE:
             raise InvalidPasswordException(
-                reason='Password should be at least 3 characters'
+                reason=PASSWORD_LEN_ERROR_MESSAGE
             )
         if user.email in password:
             raise InvalidPasswordException(
-                reason='Пароль не должен содержать e-mail'
+                reason=NO_EMAIL_IN_PASSWORD_MESSAGE
             )
 
     async def on_after_register(

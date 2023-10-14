@@ -8,6 +8,7 @@ from app.models import CharityProject
 
 
 class CRUDCharityproject(CRUDBase):
+
     async def get_project_id_by_name(
             self,
             project_name: str,
@@ -19,5 +20,6 @@ class CRUDCharityproject(CRUDBase):
             )
         )
         return db_project_id.scalars().first()
+
 
 charity_project_crud = CRUDCharityproject(CharityProject)

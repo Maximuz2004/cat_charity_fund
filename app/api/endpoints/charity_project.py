@@ -10,16 +10,19 @@ from app.api.validators import (
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charityproject import charity_project_crud
-from app.schemas.charityproject import (
+from app.schemas.charity_project import (
     CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
 )
 from app.services import investing
+
+CHARITY_PROJECT_PATH = '/'
+CHARITY_PROJECT_MODIFY_PATH = CHARITY_PROJECT_PATH + '{project_id}'
 
 router = APIRouter()
 
 
 @router.post(
-    '/',
+    CHARITY_PROJECT_PATH,
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
@@ -47,7 +50,7 @@ async def create_charity_project(
 
 
 @router.get(
-    '/',
+    CHARITY_PROJECT_PATH,
     response_model=list[CharityProjectDB],
     response_model_exclude_none=True,
 )
@@ -58,7 +61,7 @@ async def get_all_charity_projects(
 
 
 @router.patch(
-    '/{project_id}',
+    CHARITY_PROJECT_MODIFY_PATH,
     response_model=CharityProjectDB,
     dependencies=[Depends(current_superuser)],
 )
@@ -78,7 +81,8 @@ async def partially_update_charity_project(
         object_in=object_in
     )
     try:
-        project = await charity_project_crud.update(project, object_in, session)
+        project = await charity_project_crud.update(project, object_in,
+                                                    session)
     except ValueError as error:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -86,8 +90,9 @@ async def partially_update_charity_project(
         )
     return project
 
+
 @router.delete(
-    '/{project_id}',
+    CHARITY_PROJECT_MODIFY_PATH,
     response_model=CharityProjectDB,
     dependencies=[Depends(current_superuser)],
 )

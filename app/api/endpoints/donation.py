@@ -11,11 +11,14 @@ from app.models import User
 from app.schemas.donation import DonationCreate, DonationDB, DonationGet
 from app.services import investing
 
+DONATION_PATH = '/'
+DONATION_MY_PATH = DONATION_PATH + 'my'
+
 router = APIRouter()
 
 
 @router.post(
-    '/',
+    DONATION_PATH,
     response_model=DonationDB,
     response_model_exclude_none=True,
 )
@@ -38,7 +41,7 @@ async def create_donation(
 
 
 @router.get(
-    '/',
+    DONATION_PATH,
     response_model=list[DonationGet],
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
@@ -51,7 +54,7 @@ async def get_all_donations(
 
 
 @router.get(
-    '/my',
+    DONATION_MY_PATH,
     response_model=list[DonationDB],
 )
 async def get_my_donations(
