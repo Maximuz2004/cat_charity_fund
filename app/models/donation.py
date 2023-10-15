@@ -8,4 +8,4 @@ class Donation(CharityProjectDonationAbstractBase):
     comment = Column(Text)
 
     def __repr__(self):
-        return f'Пожертвование на сумму: {self.full_amount}'
+        return f'Пожертвование. {super().__repr__()}'

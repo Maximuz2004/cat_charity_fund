@@ -44,7 +44,7 @@ async def check_project_exists(
     return project
 
 
-async def check_can_project_be_modified(
+def check_can_project_be_modified(
         project: CharityProject,
         object_in: CharityProjectUpdate,
 ) -> None:
@@ -61,7 +61,7 @@ async def check_can_project_be_modified(
         )
 
 
-async def check_project_investing(
+def check_project_investing(
         project: CharityProject,
 ) -> None:
     if project.invested_amount != 0:

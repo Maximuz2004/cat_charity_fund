@@ -36,8 +36,8 @@ QRKot - это приложение для благотворительного 
 ## Документация API проекта
 
 Документация API проекта доступена по адресам:
-- http://127.0.0.1:8000/docs#
-- http://127.0.0.1:8000/redoc#
+- [Документация (Swagger)](http://127.0.0.1:8000/docs#)
+- [Документация (Redoc)](http://127.0.0.1:8000/redoc#)
 
 ## Установка и запуск:
 Клонировать репозиторий и перейти в него в командной строке:
@@ -84,7 +84,7 @@ pip install -r requirements.txt
 ```
 APP_TITLE=Кошачий благотворительный фонд
 APP_DESCRIPTION=Сервис для поддержки котиков!
-DATABASE_URL=sqlite+aiosqlite:///./fastapi.db
+DATABASE_URL=sqlite+aiosqlite:///./charity_project_donation.db
 SECRET=Some secret word
 ```
 Значение секретного ключа ```SECRET``` можете установить на свое

@@ -1,6 +1,4 @@
-from http import HTTPStatus
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.validators import (
@@ -10,6 +8,7 @@ from app.api.validators import (
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charityproject import charity_project_crud
+from app.crud.donation import donation_crud
 from app.schemas.charity_project import (
     CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
 )
@@ -34,17 +33,18 @@ async def create_charity_project(
     """Только для суперюзеров.
     Создаёт благотворительный проект."""
     await check_name_duplicate(charity_project.name, session)
-    try:
-        project = await charity_project_crud.create(
-            charity_project,
-            session
+    project = await charity_project_crud.create(
+        charity_project,
+        session,
+        False,
+    )
+    session.add_all(
+        investing(
+            project,
+            await donation_crud.get_open_objects(session)
         )
-    except ValueError as error:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=str(error)
-        )
-    await investing(session)
+    )
+    await session.commit()
     await session.refresh(project)
     return project
 
@@ -76,18 +76,11 @@ async def partially_update_charity_project(
     project = await check_project_exists(project_id, session)
     if object_in.name is not None:
         await check_name_duplicate(object_in.name, session)
-    await check_can_project_be_modified(
+    check_can_project_be_modified(
         project=project,
         object_in=object_in
     )
-    try:
-        project = await charity_project_crud.update(project, object_in,
-                                                    session)
-    except ValueError as error:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=str(error)
-        )
+    project = await charity_project_crud.update(project, object_in, session)
     return project
 
 
@@ -102,5 +95,5 @@ async def remove_charity_project(
 ):
     """Только для суперюзеров."""
     project = await check_project_exists(project_id, session)
-    await check_project_investing(project)
+    check_project_investing(project)
     return await charity_project_crud.remove(project, session)

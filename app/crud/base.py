@@ -21,6 +21,7 @@ class CRUDBase(Generic[Model, Schema]):
             self,
             object_in: Schema,
             session: AsyncSession,
+            commit: bool = True,
             user: Optional[User] = None,
     ) -> Optional[Model]:
         object_in_data = object_in.dict()
@@ -28,8 +29,9 @@ class CRUDBase(Generic[Model, Schema]):
             object_in_data['user_id'] = user.id
         db_object = self.model(**object_in_data)
         session.add(db_object)
-        await session.commit()
-        await session.refresh(db_object)
+        if commit:
+            await session.commit()
+            await session.refresh(db_object)
         return db_object
 
     async def get(
@@ -73,3 +75,18 @@ class CRUDBase(Generic[Model, Schema]):
         await session.delete(db_object)
         await session.commit()
         return db_object
+
+    async def get_open_objects(
+            self,
+            session: AsyncSession
+    ) -> list[Optional[Model]]:
+        query = await session.execute(
+            select(
+                self.model
+            ).where(
+                ~self.model.fully_invested
+            ).order_by(
+                self.model.create_date
+            )
+        )
+        return query.scalars().all()

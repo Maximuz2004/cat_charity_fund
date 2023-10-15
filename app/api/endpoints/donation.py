@@ -1,10 +1,9 @@
-from http import HTTPStatus
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
 from app.core.user import current_superuser, current_user
+from app.crud.charityproject import charity_project_crud
 from app.crud.donation import donation_crud
 from app.models import User
 
@@ -28,16 +27,16 @@ async def create_donation(
         user: User = Depends(current_user),
 ):
     """Сделать пожертвование"""
-    try:
-        new_donation = await donation_crud.create(donation, session, user)
-    except ValueError as error:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=str(error)
+    donation = await donation_crud.create(donation, session, user)
+    session.add_all(
+        investing(
+            donation,
+            await charity_project_crud.get_open_objects(session)
         )
-    await investing(session)
-    await session.refresh(new_donation)
-    return new_donation
+    )
+    await session.commit()
+    await session.refresh(donation)
+    return donation
 
 
 @router.get(

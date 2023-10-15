@@ -4,7 +4,7 @@ from sqlalchemy.orm import validates
 from .abstract import CharityProjectDonationAbstractBase
 from app.core.constants import (
     DESCRIPTION_FIELD_NAME, FIELD_MAX_LENGTH, FIELD_MIN_LENGTH,
-    FULL_AMOUNT_FIELD_NAME, FULL_AMOUNT_MIN_VALUE, NAME_FIELD_NAME
+    NAME_FIELD_NAME
 )
 
 VALUE_ERROR_MESSAGE = 'Поле {} не может быть пустым'
@@ -21,11 +21,5 @@ class CharityProject(CharityProjectDonationAbstractBase):
             raise ValueError(VALUE_ERROR_MESSAGE.format(key))
         return value
 
-    @validates(FULL_AMOUNT_FIELD_NAME)
-    def validate_full_amount(self, key, value):
-        if value <= FULL_AMOUNT_MIN_VALUE or value is None:
-            raise ValueError(FULL_AMOUNT_ERROR_MESSAGE.format(key))
-        return value
-
     def __repr__(self):
-        return f'Проект: "{self.name}", на сумму: {self.full_amount}'
+        return f'Проект: "{self.name}", {super().__repr__()})'
